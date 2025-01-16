@@ -149,7 +149,7 @@ impl HttpServer {
                                     .map(char::from)
                                     .collect();
                                 
-                                trace!("Random ID: {}, res: {:#?}", random_id, res);
+                                trace!("Random ID: {}", random_id);
                                 trace!("Random ID: {}, start at: {}", random_id, Local::now());
                                 let msg = res.bytes();
                                 trace!("Random ID: {}, Sending web socket response: res size = {}, max message size = {}", random_id, msg.len(), max_message_size);
