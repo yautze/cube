@@ -2184,6 +2184,10 @@ export class PreAggregations {
       dataSource = 'default',
       preAggregationSchema: string,
     ) => {
+      this.logger('loadAllPreAggregationsIfNeeded getLoadCacheByDataSource', {
+        loadCacheByDataSource: loadCacheByDataSource,
+        condition: loadCacheByDataSource[`${dataSource}_${preAggregationSchema}`]
+      });
       if (!loadCacheByDataSource[`${dataSource}_${preAggregationSchema}`]) {
         loadCacheByDataSource[`${dataSource}_${preAggregationSchema}`] =
           new PreAggregationLoadCache(

@@ -487,6 +487,9 @@ export class QueryCache {
           () => this.driverFactory(dataSource),
           (client, req) => {
             this.logger('Executing SQL', { ...req });
+            this.logger('GetQueue client ', {
+              client_type: client.constructor.name
+            });
             if (req.useCsvQuery) {
               return this.csvQuery(client, req);
             } else {
@@ -556,6 +559,9 @@ export class QueryCache {
         (client, q) => {
           this.logger('Executing SQL', {
             ...q
+          });
+          this.logger('GetExternalQueue client ', {
+            client_type: client.constructor.name
           });
           return client.query(q.query, q.values, q);
         },

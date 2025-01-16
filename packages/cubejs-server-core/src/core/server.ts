@@ -189,6 +189,10 @@ export class CubejsServerCore {
     this.optsHandler = new OptsHandler(this, opts, systemOptions);
     this.options = this.optsHandler.getCoreInitializedOptions();
 
+    this.logger('CubejsServerCore constructor', {
+      options: this.options
+    });
+
     this.repository = new FileRepository(this.options.schemaPath);
     this.repositoryFactory = this.options.repositoryFactory || (() => this.repository);
 

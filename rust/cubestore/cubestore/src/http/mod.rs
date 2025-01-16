@@ -39,6 +39,8 @@ use tokio_util::sync::CancellationToken;
 use warp::filters::ws::{Message, Ws};
 use warp::http::StatusCode;
 use warp::reject::Reject;
+use chrono::Local;
+use rand::{distributions::Alphanumeric, Rng};
 
 pub struct HttpServer {
     bind_address: String,
@@ -141,15 +143,28 @@ impl HttpServer {
                     loop {
                         tokio::select! {
                             Some(res) = response_rx.recv() => {
-                                trace!("Sending web socket response");
+                                let random_id: String = rand::thread_rng()
+                                    .sample_iter(&Alphanumeric)
+                                    .take(12)
+                                    .map(char::from)
+                                    .collect();
+                                
+                                trace!("Random ID: {}, res: {:#?}", random_id, res);
+                                trace!("Random ID: {}, start at: {}", random_id, Local::now());
+                                let msg = res.bytes();
+                                trace!("Random ID: {}, Sending web socket response: res size = {}, max message size = {}", random_id, msg.len(), max_message_size);
+
                                 let send_res = web_socket.send(Message::binary(res.bytes())).await;
                                 if let Err(e) = send_res {
-                                    error!("Websocket message send error: {:?}", e)
+                                    error!("Random ID: {}, Websocket message send error: {:?}", random_id, e);
                                 }
+
                                 if res.should_close_connection() {
-                                   log::warn!("Websocket connection closed");
+                                   log::warn!("Random ID: {}, Websocket connection closed", random_id);
                                    break;
                                 }
+
+                                trace!("Random ID: {}, end at: {}", random_id, Local::now());
                             }
                             Some(msg) = web_socket.next() => {
                                 match msg {
@@ -253,6 +268,7 @@ impl HttpServer {
                         {
                             let mut messages = messages_state.lock().await;
                             let state = messages.get_mut(&key);
+                            trace!("process_channel key: {:?}", key);
                             match state {
                                 None => {
                                     messages.insert(key.clone(), ProcessingState::Processing { subscribed_senders: vec![sender], last_touch: SystemTime::now() });

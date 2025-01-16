@@ -188,6 +188,7 @@ function getCompactRow(
   timeDimensions: QueryTimeDimension[] | undefined,
   dbRow: { [sqlAlias: string]: DBResponseValue },
 ): DBResponsePrimitive[] {
+  console.log("Start to getCompactRow");
   const row: DBResponsePrimitive[] = [];
   members.forEach((m: string) => {
     if (annotation[m]) {
@@ -212,6 +213,7 @@ function getCompactRow(
       ] as DBResponsePrimitive
     );
   }
+  console.log("End getCompactRow");
   return row;
 }
 
@@ -227,6 +229,7 @@ function getVanilaRow(
   query: NormalizedQuery,
   dbRow: { [sqlAlias: string]: DBResponseValue },
 ): { [member: string]: DBResponsePrimitive } {
+  console.log("Start to getVanilaRow");
   const row = R.pipe(
     R.toPairs,
     R.map(p => {
@@ -242,6 +245,8 @@ function getVanilaRow(
           'setting-a-primary-key.'
         );
       }
+      console.log("transformResult");
+
       const transformResult = [
         memberName,
         transformValue(
@@ -256,6 +261,7 @@ function getVanilaRow(
        * @deprecated
        * @todo backward compatibility for referencing
        */
+      console.log("memberNameWithoutGranularity");
       const memberNameWithoutGranularity =
         [path[0], path[1]].join(MEMBER_SEPARATOR);
       if (
@@ -279,6 +285,7 @@ function getVanilaRow(
     R.fromPairs
   // @ts-ignore
   )(dbRow);
+  console.log("getDateRangeValue");
   if (queryType === QueryTypeEnum.COMPARE_DATE_RANGE_QUERY) {
     return {
       ...row,
@@ -291,6 +298,7 @@ function getVanilaRow(
         row[getBlendingResponseKey(query.timeDimensions)]
     };
   }
+  console.log("End getVanilaRow");
   return row as { [member: string]: DBResponsePrimitive; };
 }
 
@@ -310,7 +318,10 @@ function transformData(
 } | {
   [member: string]: DBResponsePrimitive
 }[] {
+  console.log("Start to Transform Data");
   const d = data as { [sqlAlias: string]: DBResponseValue }[];
+  console.log("Start to Mapping Members");
+
   const membersToAliasMap = getMembers(
     queryType,
     query,
@@ -319,6 +330,9 @@ function transformData(
     annotation,
   );
   const members: string[] = Object.keys(membersToAliasMap);
+  console.log("Mapping Members end");
+  console.log("Start to forloop each row");
+  
   const dataset: DBResponsePrimitive[][] | {
     [member: string]: DBResponsePrimitive
   }[] = d.map((r) => {

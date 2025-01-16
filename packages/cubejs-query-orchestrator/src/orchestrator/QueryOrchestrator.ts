@@ -68,6 +68,12 @@ export class QueryOrchestrator {
     this.rollupOnlyMode = options.rollupOnlyMode;
     const cacheAndQueueDriver = detectQueueAndCacheDriver(options);
 
+    this.logger('QueryOrchestrator constructor', {
+      cacheAndQueueDriver: cacheAndQueueDriver,
+      redisPrefix: redisPrefix,
+      options: options
+    });
+
     if (!['memory', 'cubestore'].includes(cacheAndQueueDriver)) {
       throw new Error(
         `Only 'cubestore' or 'memory' are supported for cacheAndQueueDriver option, passed: ${cacheAndQueueDriver}`
@@ -224,6 +230,12 @@ export class QueryOrchestrator {
       };
     }
 
+    this.logger('fetchQuery loadAllPreAggregationsIfNeeded result',{
+      preAggregationsTablesToTempTables: preAggregationsTablesToTempTables,
+      values: values,
+      queryBody: queryBody
+    });
+
     const usedPreAggregations = R.pipe(
       R.fromPairs,
       R.map((pa: TempTable) => ({
@@ -280,6 +292,11 @@ export class QueryOrchestrator {
       queryBody,
       preAggregationsTablesToTempTables
     );
+
+    this.logger('fetchQuery queryCache cachedQueryResult', {
+      result: result,
+      queryCacheType: typeof this.queryCache
+    });
 
     lastRefreshTimestamp = getLastUpdatedAtTimestamp([
       lastRefreshTimestamp,
