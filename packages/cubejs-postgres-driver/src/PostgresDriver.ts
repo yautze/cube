@@ -202,6 +202,7 @@ export class PostgresDriver<Config extends PostgresDriverConfiguration = Postgre
       return hllTypeParser;
     }
 
+    // @ts-ignore
     const parser = types.getTypeParser(dataTypeID, format);
     return (val: any) => parser(val);
   };
@@ -351,6 +352,7 @@ export class PostgresDriver<Config extends PostgresDriverConfiguration = Postgre
         text: query,
         values: values || [],
         types: {
+          // @ts-ignore
           getTypeParser: this.getTypeParser,
         },
       });
@@ -363,6 +365,7 @@ export class PostgresDriver<Config extends PostgresDriverConfiguration = Postgre
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async query<R = unknown>(query: string, values: unknown[], options?: QueryOptions): Promise<R[]> {
     const result = await this.queryResponse(query, values);
+    // @ts-ignore
     return result.rows;
   }
 
@@ -373,7 +376,9 @@ export class PostgresDriver<Config extends PostgresDriverConfiguration = Postgre
 
     const res = await this.queryResponse(query, values);
     return {
+      // @ts-ignore
       rows: res.rows,
+      // @ts-ignore
       types: this.mapFields(res.fields),
     };
   }

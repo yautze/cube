@@ -190,7 +190,9 @@ export class MaterializeDriver extends PostgresDriver {
     let finish = false;
 
     while (!finish) {
+      // @ts-ignore
       const results: QueryResult<any> | undefined = await conn.query(queryParams);
+      // @ts-ignore
       const { rows, rowCount } = results;
 
       if (rowCount === 0) {
@@ -222,17 +224,21 @@ export class MaterializeDriver extends PostgresDriver {
       await this.prepareConnection(conn);
       await conn.query('BEGIN;', []);
       await conn.query(`DECLARE ${cursorId} CURSOR FOR ${query}`, values);
+      // @ts-ignore
       const { fields } = await conn.query({
         text: `FETCH 0 FROM ${cursorId};`,
         values: [],
         types: {
+          // @ts-ignore
           getTypeParser: this.getTypeParser,
         },
       });
+      // @ts-ignore
       const rowStream = Readable.from(this.asyncFetcher(conn, cursorId), { highWaterMark });
 
       return {
         rowStream,
+        // @ts-ignore
         types: this.mapFields(fields),
         release: () => this.releaseStream(conn)
       };
