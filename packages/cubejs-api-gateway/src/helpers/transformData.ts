@@ -188,7 +188,6 @@ function getCompactRow(
   timeDimensions: QueryTimeDimension[] | undefined,
   dbRow: { [sqlAlias: string]: DBResponseValue },
 ): DBResponsePrimitive[] {
-  console.log("Start to getCompactRow");
   const row: DBResponsePrimitive[] = [];
   members.forEach((m: string) => {
     if (annotation[m]) {
@@ -213,7 +212,6 @@ function getCompactRow(
       ] as DBResponsePrimitive
     );
   }
-  console.log("End getCompactRow");
   return row;
 }
 
@@ -333,6 +331,7 @@ function transformData(
   console.log("Mapping Members end");
   console.log("Start to forloop each row");
   
+  const startTime = Date.now();
   const dataset: DBResponsePrimitive[][] | {
     [member: string]: DBResponsePrimitive
   }[] = d.map((r) => {
@@ -358,6 +357,9 @@ function transformData(
   }) as DBResponsePrimitive[][] | {
     [member: string]: DBResponsePrimitive
   }[];
+  const endTime = Date.now();
+  console.log(`getCompactRow execution time: ${endTime - startTime} ms`);
+
   return (resType === ResultTypeEnum.COMPACT
     ? { members, dataset }
     : dataset

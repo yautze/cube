@@ -40,7 +40,10 @@ use warp::filters::ws::{Message, Ws};
 use warp::http::StatusCode;
 use warp::reject::Reject;
 use chrono::Local;
-use rand::{distributions::Alphanumeric, Rng};
+use uuid::Uuid;
+use flate2::write::ZlibEncoder;
+use flate2::Compression;
+use std::io::prelude::*;
 
 pub struct HttpServer {
     bind_address: String,
@@ -143,18 +146,19 @@ impl HttpServer {
                     loop {
                         tokio::select! {
                             Some(res) = response_rx.recv() => {
-                                let random_id: String = rand::thread_rng()
-                                    .sample_iter(&Alphanumeric)
-                                    .take(12)
-                                    .map(char::from)
-                                    .collect();
-                                
+                                let random_id: String = Uuid::new_v4().to_string();
                                 trace!("Random ID: {}", random_id);
-                                trace!("Random ID: {}, start at: {}", random_id, Local::now());
-                                let msg = res.bytes();
-                                trace!("Random ID: {}, Sending web socket response: res size = {}, max message size = {}", random_id, msg.len(), max_message_size);
 
-                                let send_res = web_socket.send(Message::binary(res.bytes())).await;
+                                let start_time = Local::now();
+                                trace!("Random ID: {}, start at: {}", random_id, start_time);
+
+                                let msg = res.compressed_bytes(random_id.clone());
+                                let compressed_time = Local::now();
+                                let duration = (compressed_time - start_time).num_milliseconds();
+                                trace!("Random ID: {}, Sending web socket response: compress size = {}, max message size = {}", random_id, msg.len(), max_message_size);
+                                trace!("Random ID: {}, Compression completed in {} ms", random_id, duration);
+
+                                let send_res = web_socket.send(Message::binary(msg)).await;
                                 if let Err(e) = send_res {
                                     error!("Random ID: {}, Websocket message send error: {:?}", random_id, e);
                                 }
@@ -685,6 +689,14 @@ impl HttpMessage {
         let message = crate::codegen::HttpMessage::create(&mut builder, &args);
         builder.finish(message, None);
         builder.finished_data().to_vec() // TODO copy
+    }
+
+    pub fn compressed_bytes(&self, random_id: String) -> Vec<u8> {
+        let origin = self.bytes();
+        trace!("Random ID {}, origiin data size {}", random_id, origin.len());
+        let mut encoder = ZlibEncoder::new(Vec::new(), Compression::default());
+        encoder.write_all(&origin).expect("Failed to write data");
+        encoder.finish().expect("Failed to compress data")
     }
 
     pub fn should_close_connection(&self) -> bool {

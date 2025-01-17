@@ -1,5 +1,6 @@
 import WebSocket from 'ws';
 import * as flatbuffers from 'flatbuffers';
+import * as pako from 'pako';
 import { InlineTable } from '@cubejs-backend/base-driver';
 import { getEnv } from '@cubejs-backend/shared';
 import { v4 as uuidv4 } from 'uuid';
@@ -109,7 +110,14 @@ export class WebSocketConnection {
           }
         });
         webSocket.on('message', (msg) => {
-          const buf = new flatbuffers.ByteBuffer(msg);
+          const startTime = Date.now();
+          const compressed = new Uint8Array(msg);
+          const decompressed = pako.inflate(compressed);
+          const endTime = Date.now();
+          console.log(`compressed size: ${compressed.length}, decompressed size: ${decompressed.length}`);
+          console.log(`Execution time: ${endTime - startTime} ms`);
+
+          const buf = new flatbuffers.ByteBuffer(decompressed);
           const httpMessage = HttpMessage.getRootAsHttpMessage(buf);
           const resolvers = webSocket.sentMessages[httpMessage.messageId()];
           delete webSocket.sentMessages[httpMessage.messageId()];
