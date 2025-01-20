@@ -227,7 +227,6 @@ function getVanilaRow(
   query: NormalizedQuery,
   dbRow: { [sqlAlias: string]: DBResponseValue },
 ): { [member: string]: DBResponsePrimitive } {
-  console.log("Start to getVanilaRow");
   const row = R.pipe(
     R.toPairs,
     R.map(p => {
@@ -243,7 +242,6 @@ function getVanilaRow(
           'setting-a-primary-key.'
         );
       }
-      console.log("transformResult");
 
       const transformResult = [
         memberName,
@@ -259,7 +257,6 @@ function getVanilaRow(
        * @deprecated
        * @todo backward compatibility for referencing
        */
-      console.log("memberNameWithoutGranularity");
       const memberNameWithoutGranularity =
         [path[0], path[1]].join(MEMBER_SEPARATOR);
       if (
@@ -283,7 +280,6 @@ function getVanilaRow(
     R.fromPairs
   // @ts-ignore
   )(dbRow);
-  console.log("getDateRangeValue");
   if (queryType === QueryTypeEnum.COMPARE_DATE_RANGE_QUERY) {
     return {
       ...row,
@@ -296,7 +292,6 @@ function getVanilaRow(
         row[getBlendingResponseKey(query.timeDimensions)]
     };
   }
-  console.log("End getVanilaRow");
   return row as { [member: string]: DBResponsePrimitive; };
 }
 
@@ -358,7 +353,7 @@ function transformData(
     [member: string]: DBResponsePrimitive
   }[];
   const endTime = Date.now();
-  console.log(`getCompactRow execution time: ${endTime - startTime} ms`);
+  console.log(`transformData ${resType} execution time: ${endTime - startTime} ms`);
 
   return (resType === ResultTypeEnum.COMPACT
     ? { members, dataset }
