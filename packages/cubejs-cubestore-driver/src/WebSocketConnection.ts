@@ -22,6 +22,8 @@ export class WebSocketConnection {
 
   protected currentConnectionTry: number;
 
+  protected maxPayload: number;
+
   protected webSocket: any;
 
   private url: string;
@@ -34,12 +36,15 @@ export class WebSocketConnection {
     this.maxConnectRetries = getEnv('cubeStoreMaxConnectRetries');
     this.noHeartBeatTimeout = getEnv('cubeStoreNoHeartBeatTimeout');
     this.currentConnectionTry = 0;
+    this.maxPayload = getEnv('cubeStoreWsMsgMaxSize');
     this.connectionId = uuidv4();
   }
 
   protected async initWebSocket() {
     if (!this.webSocket) {
-      const webSocket: any = new WebSocket(this.url);
+      const webSocket: any = new WebSocket(this.url, {
+        maxPayload: this.maxPayload
+      });
       webSocket.readyPromise = new Promise<WebSocket>((resolve, reject) => {
         webSocket.lastHeartBeat = new Date();
         const pingInterval = setInterval(() => {
@@ -66,6 +71,7 @@ export class WebSocketConnection {
         });
         webSocket.on('open', () => resolve(webSocket));
         webSocket.on('error', (err) => {
+          console.log(`on error: ${err}`);
           this.currentConnectionTry += 1;
           if (this.currentConnectionTry < this.maxConnectRetries) {
             setTimeout(async () => {
@@ -85,6 +91,7 @@ export class WebSocketConnection {
           webSocket.lastHeartBeat = new Date();
         });
         webSocket.on('close', () => {
+          console.log("on close");
           clearInterval(pingInterval);
 
           if (Object.keys(webSocket.sentMessages).length) {
