@@ -39,6 +39,10 @@ use tokio_util::sync::CancellationToken;
 use warp::filters::ws::{Message, Ws};
 use warp::http::StatusCode;
 use warp::reject::Reject;
+use chrono::Local;
+use flate2::write::ZlibEncoder;
+use flate2::Compression;
+use std::io::prelude::*;
 
 pub struct HttpServer {
     bind_address: String,
@@ -141,11 +145,17 @@ impl HttpServer {
                     loop {
                         tokio::select! {
                             Some(res) = response_rx.recv() => {
-                                trace!("Sending web socket response");
-                                let send_res = web_socket.send(Message::binary(res.bytes())).await;
+                                let start_time = Local::now();
+                                let msg = res.bytes();
+                                let compressed_duration = (Local::now() - start_time).num_milliseconds();
+
+                                trace!("Sending web socket response: data size = {}, duration = {}", msg.len(), compressed_duration);
+                                
+                                let send_res = web_socket.send(Message::binary(msg)).await;
                                 if let Err(e) = send_res {
                                     error!("Websocket message send error: {:?}", e)
                                 }
+
                                 if res.should_close_connection() {
                                    log::warn!("Websocket connection closed");
                                    break;
@@ -670,6 +680,15 @@ impl HttpMessage {
         builder.finish(message, None);
         builder.finished_data().to_vec() // TODO copy
     }
+
+    // for large data case
+    // pub fn compressed_bytes(&self) -> Vec<u8> {
+    //     let origin = self.bytes();
+    //     trace!("Origin ws message size {}", origin.len());
+    //     let mut encoder = ZlibEncoder::new(Vec::new(), Compression::default());
+    //     encoder.write_all(&origin).expect("Failed to write data");
+    //     encoder.finish().expect("Failed to compress data")
+    // }
 
     pub fn should_close_connection(&self) -> bool {
         matches!(self.command, HttpCommand::CloseConnection { .. })

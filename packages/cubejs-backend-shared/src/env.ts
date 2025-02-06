@@ -1782,6 +1782,9 @@ const variables: Record<string, (...args: any) => any> = {
   cubeStoreNoHeartBeatTimeout: () => get('CUBEJS_CUBESTORE_NO_HEART_BEAT_TIMEOUT')
     .default('30')
     .asInt(),
+  cubeStoreWsMsgMaxSize: () => get('CUBEJS_CUBESTORE_WS_MSG_MAX_SIZE')
+    .default(524288000)
+    .asInt(),
 
   allowUngroupedWithoutPrimaryKey: () => get('CUBEJS_ALLOW_UNGROUPED_WITHOUT_PRIMARY_KEY')
     .default(get('CUBESQL_SQL_PUSH_DOWN').default('true').asString())

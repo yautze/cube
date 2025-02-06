@@ -603,6 +603,7 @@ export class DevServer {
       const { payload = {} } = req.body;
       const jwtOptions = typeof payload.exp != null ? {} : { expiresIn: '1d' };
 
+      // @ts-ignore
       const token = jwt.sign(payload, options.apiSecret, jwtOptions);
 
       res.json({ token });

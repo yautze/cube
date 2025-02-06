@@ -11,7 +11,7 @@ import {
   HttpQuery,
   HttpResultSet,
   HttpTable
-} from '../codegen';
+} from '../codegen'; 
 
 export class WebSocketConnection {
   protected messageCounter: number;
@@ -21,6 +21,8 @@ export class WebSocketConnection {
   protected noHeartBeatTimeout: number;
 
   protected currentConnectionTry: number;
+
+  protected maxPayload: number;
 
   protected webSocket: any;
 
@@ -34,12 +36,15 @@ export class WebSocketConnection {
     this.maxConnectRetries = getEnv('cubeStoreMaxConnectRetries');
     this.noHeartBeatTimeout = getEnv('cubeStoreNoHeartBeatTimeout');
     this.currentConnectionTry = 0;
+    this.maxPayload = getEnv('cubeStoreWsMsgMaxSize');
     this.connectionId = uuidv4();
   }
 
   protected async initWebSocket() {
     if (!this.webSocket) {
-      const webSocket: any = new WebSocket(this.url);
+      const webSocket: any = new WebSocket(this.url, {
+        maxPayload: this.maxPayload
+      });
       webSocket.readyPromise = new Promise<WebSocket>((resolve, reject) => {
         webSocket.lastHeartBeat = new Date();
         const pingInterval = setInterval(() => {

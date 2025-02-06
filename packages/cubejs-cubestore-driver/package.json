@@ -38,7 +38,8 @@
     "sqlstring": "^2.3.3",
     "tempy": "^1.0.1",
     "uuid": "^8.3.2",
-    "ws": "^7.4.3"
+    "ws": "^7.4.3",
+    "pako": "2.1.0"
   },
   "devDependencies": {
     "@cubejs-backend/linter": "^1.0.0",

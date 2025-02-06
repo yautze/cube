@@ -1194,14 +1194,14 @@ impl Config {
 
         let transport_max_message_size = env_parse_size(
             "CUBESTORE_TRANSPORT_MAX_MESSAGE_SIZE",
-            64 << 20,
-            Some(256 << 20),
-            Some(16 << 20),
+            512 << 20,
+            None,
+            None,
         );
 
         let cachestore_cache_max_entry_size = env_parse_size(
             "CUBESTORE_CACHE_MAX_ENTRY_SIZE",
-            (64 << 20) - (1024 << 10),
+            (512 << 20) - (1024 << 10),
             Some(transport_max_message_size - (1024 << 10)),
             None,
         );
@@ -1511,9 +1511,9 @@ impl Config {
                 transport_max_message_size,
                 transport_max_frame_size: env_parse_size(
                     "CUBESTORE_TRANSPORT_MAX_FRAME_SIZE",
-                    64 << 20,
-                    Some(256 << 20),
-                    Some(4 << 20),
+                    256 << 20,
+                    None,
+                    None,
                 ),
                 local_files_cleanup_interval_secs: env_parse(
                     "CUBESTORE_LOCAL_FILES_CLEANUP_INTERVAL_SECS",
