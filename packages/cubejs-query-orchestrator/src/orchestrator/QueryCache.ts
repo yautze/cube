@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import csvWriter from 'csv-write-stream';
-import type { LRUCache } from 'lru-cache';
+import LRUCache from 'lru-cache';
 import { pipeline } from 'stream';
 import { getEnv, MaybeCancelablePromise, streamToArray } from '@cubejs-backend/shared';
 import { CubeStoreCacheDriver, CubeStoreDriver } from '@cubejs-backend/cubestore-driver';
@@ -139,7 +139,8 @@ export class QueryCache {
 
   protected externalQueue: QueryQueue | null = null;
 
-  protected memoryCache: LRUCache<string, CacheEntry>;
+  // @ts-ignore
+  protected memoryCache: InstanceType<typeof LRUCache>;
 
   public constructor(
     protected readonly redisPrefix: string,

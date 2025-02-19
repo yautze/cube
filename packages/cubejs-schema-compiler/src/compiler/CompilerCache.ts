@@ -1,12 +1,12 @@
-import type { LRUCache } from 'lru-cache';
+import LRUCache from 'lru-cache';
 import { QueryCache } from '../adapter/QueryCache';
 
 export class CompilerCache extends QueryCache {
   // @ts-ignore
-  protected readonly queryCache: LRUCache<string, QueryCache>;
+  protected readonly queryCache: InstanceType<typeof LRUCache>;
 
   // @ts-ignore
-  protected readonly rbacCache: LRUCache<string, any>;
+  protected readonly rbacCache: InstanceType<typeof LRUCache>;
 
   public constructor({ maxQueryCacheSize, maxQueryCacheAge }) {
     super();
@@ -14,7 +14,6 @@ export class CompilerCache extends QueryCache {
     // @ts-ignore
     this.queryCache = new LRUCache({
       max: maxQueryCacheSize || 10000,
-      // @ts-ignore
       maxAge: (maxQueryCacheAge * 1000) || 1000 * 60 * 10,
       updateAgeOnGet: true
     });
@@ -22,13 +21,12 @@ export class CompilerCache extends QueryCache {
     // @ts-ignore
     this.rbacCache = new LRUCache({
       max: 10000,
-      // @ts-ignore
       maxAge: 1000 * 60 * 5, // 5 minutes
     });
   }
 
   // @ts-ignore
-  public getRbacCacheInstance(): LRUCache<string, any> {
+  public getRbacCacheInstance(): InstanceType<typeof LRUCache> {
     return this.rbacCache;
   }
 

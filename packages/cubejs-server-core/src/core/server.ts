@@ -1,7 +1,7 @@
 /* eslint-disable global-require,no-return-assign */
 import crypto from 'crypto';
 import fs from 'fs-extra';
-import type { LRUCache } from 'lru-cache';
+import LRUCache from 'lru-cache';
 import isDocker from 'is-docker';
 import pLimit from 'p-limit';
 
@@ -135,7 +135,7 @@ export class CubejsServerCore {
   protected contextToExternalDbType: ExternalDbTypeFn;
 
   // @ts-ignore
-  protected compilerCache: LRUCache<string, CompilerApi>;
+  protected compilerCache: InstanceType<typeof LRUCache>;
 
   protected readonly contextToOrchestratorId: ContextToOrchestratorIdFn;
 
@@ -205,7 +205,6 @@ export class CubejsServerCore {
     // @ts-ignore
     this.compilerCache = new LRUCache<string, CompilerApi>({
       max: this.options.compilerCacheSize || 250,
-      // @ts-ignore
       maxAge: this.options.maxCompilerCacheKeepAlive,
       updateAgeOnGet: this.options.updateCompilerCacheKeepAlive
     });
@@ -227,7 +226,6 @@ export class CubejsServerCore {
     // proactively free up old cache values occasionally
     if (this.options.maxCompilerCacheKeepAlive) {
       this.maxCompilerCacheKeep = setInterval(
-        // @ts-ignore
         () => this.compilerCache.prune(),
         this.options.maxCompilerCacheKeepAlive
       );
@@ -557,7 +555,6 @@ export class CubejsServerCore {
     await this.orchestratorStorage.releaseConnections();
 
     this.orchestratorStorage.clear();
-    // @ts-ignore
     this.compilerCache.reset();
 
     this.reloadEnvVariables();
