@@ -12,6 +12,7 @@ use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::{watch, Mutex};
+use chrono::Local;
 
 #[derive(Clone, Hash, Eq, PartialEq, Debug, DeepSizeOf)]
 pub struct SqlResultCacheKey {
@@ -171,7 +172,9 @@ impl SqlResultCache {
         };
 
         if let Some(sender) = sender {
+            let start_time = Local::now();
             trace!("Missing cache for '{}'", query);
+            trace!("Missing cache query start at {}", start_time);
             let result = exec(plan).await.map(|d| Arc::new(d));
             if let Err(e) = sender.send(Some(result.clone())) {
                 trace!(
@@ -198,6 +201,8 @@ impl SqlResultCache {
             }
 
             self.queue_cache.lock().await.pop(&queue_key);
+            let end_time = Local::now();
+            trace!("Missing cache query end at {}, duration {}", end_time, (end_time - start_time).num_milliseconds());
 
             return result;
         }

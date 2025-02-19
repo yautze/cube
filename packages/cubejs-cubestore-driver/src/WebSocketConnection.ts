@@ -115,6 +115,7 @@ export class WebSocketConnection {
           }
         });
         webSocket.on('message', async (msg) => {
+          console.log('get msg form cube store at ' + (new Date()).toISOString() + ' size: ' + msg.length);
           const buf = new flatbuffers.ByteBuffer(msg);
           const httpMessage = HttpMessage.getRootAsHttpMessage(buf);
           const resolvers = webSocket.sentMessages[httpMessage.messageId()];

@@ -1182,6 +1182,7 @@ class ApiGateway {
 
     this.log({
       type: 'Query Rewrite',
+      time: (new Date()).toISOString(),
       query
     }, context);
 
@@ -1246,6 +1247,7 @@ class ApiGateway {
 
     this.log({
       type: 'Query Rewrite completed',
+      time: (new Date()).toISOString(),
       normalizedQueries,
       duration: new Date().getTime() - startTime,
       query
@@ -1525,6 +1527,7 @@ class ApiGateway {
 
           this.log({
             type: 'Load Request SQL',
+            time: (new Date()).toISOString(),
             duration: this.duration(loadRequestSQLStarted),
             query: normalizedQueries[index],
             sqlQuery
@@ -1751,6 +1754,7 @@ class ApiGateway {
 
       this.log({
         type: 'Load Request',
+        time: (new Date()).toISOString(),
         query
       }, context);
 
@@ -1809,6 +1813,7 @@ class ApiGateway {
       this.log(
         {
           type: 'Load Request Success',
+          time: (new Date()).toISOString(),
           query,
           duration: this.duration(requestStarted),
           apiType,
@@ -2468,6 +2473,7 @@ class ApiGateway {
   protected logNetworkUsage: RequestHandler = async (req: Request, res: ExpressResponse, next: NextFunction) => {
     this.log({
       type: 'Incoming network usage',
+      time: (new Date()).toISOString(),
       service: 'api-http',
       bytes: Buffer.byteLength(req.url + req.rawHeaders.join('\n')) + (Number(req.get('content-length')) || 0),
       path: req.path,
@@ -2475,6 +2481,7 @@ class ApiGateway {
     res.on('finish', () => {
       this.log({
         type: 'Outgoing network usage',
+        time: (new Date()).toISOString(),
         service: 'api-http',
         bytes: Number(res.get('content-length')) || 0,
         path: req.path,

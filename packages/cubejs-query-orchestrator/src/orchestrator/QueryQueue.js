@@ -210,6 +210,8 @@ export class QueryQueue {
         addedToQueueTime: new Date().getTime(),
       };
       this.logger('Waiting for query', {
+        time: (new Date()).toISOString(),
+        skipQueue: this.skipQueue,
         queueId: options.queueId,
         spanId: options.spanId,
         queueSize: 0,
@@ -309,6 +311,7 @@ export class QueryQueue {
       const [active, toProcess] = await queueConnection.getQueryStageState(true);
 
       this.logger('Waiting for query', {
+        time: (new Date()).toISOString(),
         ...waitingContext,
         queueSize,
         activeQueryKeys: active,
@@ -705,6 +708,8 @@ export class QueryQueue {
         )
       };
       this.logger('Performing query completed', {
+        time: (new Date()).toISOString(),
+        func: 'processQuerySkipQueue',
         queueId,
         queueSize: 0,
         duration: ((new Date()).getTime() - startQueryTime),
@@ -865,6 +870,8 @@ export class QueryQueue {
           }
 
           this.logger('Performing query completed', {
+            time: (new Date()).toISOString(),
+            func: 'processQuery',
             queueId,
             processingId,
             queueSize,

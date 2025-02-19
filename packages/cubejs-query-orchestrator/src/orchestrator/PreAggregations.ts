@@ -595,6 +595,7 @@ export class PreAggregationLoader {
       const getVersionsStarted = new Date();
       const { byStructure } = await this.loadCache.getVersionEntries(this.preAggregation);
       this.logger('Load PreAggregations Tables', {
+        time: (new Date()).toISOString(),
         preAggregation: this.preAggregation,
         requestId: this.requestId,
         duration: (new Date().getTime() - getVersionsStarted.getTime())

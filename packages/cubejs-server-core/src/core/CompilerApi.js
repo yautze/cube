@@ -73,6 +73,7 @@ export class CompilerApi {
     const startCompilingTime = new Date().getTime();
     try {
       this.logger(this.compilers ? 'Recompiling schema' : 'Compiling schema', {
+        time: (new Date()).toISOString(),
         version: compilerVersion,
         requestId
       });
@@ -87,6 +88,7 @@ export class CompilerApi {
       this.queryFactory = await this.createQueryFactory(compilers);
 
       this.logger('Compiling schema completed', {
+        time: (new Date()).toISOString(),
         version: compilerVersion,
         requestId,
         duration: ((new Date()).getTime() - startCompilingTime),

@@ -76,6 +76,7 @@ export class OrchestratorApi {
 
     try {
       this.logger('Query started', {
+        time: (new Date()).toISOString(),
         query: queryForLog,
         params: query.values,
         requestId: query.requestId
@@ -98,6 +99,7 @@ export class OrchestratorApi {
       const data = await fetchQueryPromise;
 
       this.logger('Query completed', {
+        time: (new Date()).toISOString(),
         duration: ((new Date()).getTime() - startQueryTime),
         query: queryForLog,
         params: query.values,
