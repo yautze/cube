@@ -2013,6 +2013,7 @@ export class PreAggregations {
 
   private readonly getQueueEventsBus: any;
 
+  // @ts-ignore
   private readonly touchCache: LRUCache<string, true>;
 
   public constructor(
@@ -2031,6 +2032,7 @@ export class PreAggregations {
     this.usedTablePersistTime = options.usedTablePersistTime || getEnv('dbQueryTimeout');
     this.externalRefresh = options.externalRefresh;
     this.getQueueEventsBus = options.getQueueEventsBus;
+    // @ts-ignore
     this.touchCache = new LRUCache({
       max: getEnv('touchPreAggregationCacheMaxCount'),
       maxAge: getEnv('touchPreAggregationCacheMaxAge') * 1000,

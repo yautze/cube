@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import csvWriter from 'csv-write-stream';
-import LRUCache from 'lru-cache';
+import type { LRUCache } from 'lru-cache';
 import { pipeline } from 'stream';
 import { getEnv, MaybeCancelablePromise, streamToArray } from '@cubejs-backend/shared';
 import { CubeStoreCacheDriver, CubeStoreDriver } from '@cubejs-backend/cubestore-driver';
@@ -164,6 +164,7 @@ export class QueryCache {
         throw new Error(`Unknown cache driver: ${options.cacheAndQueueDriver}`);
     }
 
+    // @ts-ignore
     this.memoryCache = new LRUCache<string, CacheEntry>({
       max: options.maxInMemoryCacheEntries || 10000
     });
@@ -920,6 +921,7 @@ export class QueryCache {
             inMemoryValue.renewalKey !== renewalKey
           ) || renewedAgo > expiration * 1000 || renewedAgo > inMemoryCacheDisablePeriod
         ) {
+          // @ts-ignore
           this.memoryCache.del(redisKey);
         } else {
           this.logger('Found in memory cache entry', {
