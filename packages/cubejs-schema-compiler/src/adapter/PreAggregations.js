@@ -532,6 +532,8 @@ export class PreAggregations {
      * @returns {boolean}
      */
     const canUsePreAggregationNotAdditive = (references) => {
+      console.log("--- canUsePreAggregationNotAdditive ---");
+
       const refTimeDimensions =
         backAlias(references.sortedTimeDimensions || sortTimeDimensions(references.timeDimensions));
       const qryTimeDimensions = references.allowNonStrictDateRangeMatch
@@ -540,6 +542,27 @@ export class PreAggregations {
       const backAliasMeasures = backAlias(references.measures);
       const backAliasSortedDimensions = backAlias(references.sortedDimensions || references.dimensions);
       const backAliasDimensions = backAlias(references.dimensions);
+
+      console.log("references.dimensions.length: " + references.dimensions.length);
+      console.log("references.dimensions: " + [...references.dimensions]);
+
+      console.log("filterDimensionsSingleValueEqual.length: " + filterDimensionsSingleValueEqual.size);
+      console.log("filterDimensionsSingleValueEqual: " + [...filterDimensionsSingleValueEqual]);
+
+      console.log("backAliasSortedDimensions: " + [...backAliasSortedDimensions]);
+
+
+
+      console.log("R.equals(qryTimeDimensions, refTimeDimensions): " + R.equals(qryTimeDimensions, refTimeDimensions));
+      console.log("R.equals(transformedQuery.timeDimensions, refTimeDimensions): " + R.equals(transformedQuery.timeDimensions, refTimeDimensions));
+      console.log("references.dimensions.length === filterDimensionsSingleValueEqual.size: " + references.dimensions.length === filterDimensionsSingleValueEqual.size);
+      console.log("R.all(d => filterDimensionsSingleValueEqual.has(d), backAliasDimensions): " + R.all(d => filterDimensionsSingleValueEqual.has(d), backAliasDimensions));
+      console.log("R.equals(backAliasSortedDimensions, transformedQuery.sortedDimensions): " + R.equals(backAliasSortedDimensions, transformedQuery.sortedDimensions));
+      console.log("R.all(m => backAliasMeasures.indexOf(m) !== -1, transformedQuery.measures): " + R.all(m => backAliasMeasures.indexOf(m) !== -1, transformedQuery.measures));
+      console.log("R.all(m => backAliasMeasures.indexOf(m) !== -1, transformedQuery.leafMeasures): " + R.all(m => backAliasMeasures.indexOf(m) !== -1, transformedQuery.leafMeasures));
+
+      console.log("--- canUsePreAggregationNotAdditive ---");
+
       return ((
         transformedQuery.hasNoTimeDimensionsWithoutGranularity
       ) && (
@@ -615,6 +638,7 @@ export class PreAggregations {
      * @returns {boolean}
      */
     const canUsePreAggregationLeafMeasureAdditive = (references) => {
+      console.log("--- canUsePreAggregationLeafMeasureAdditive ---");
       /**
        * Array of 2-element arrays with dimension and granularity.
        * @type {Array<Array<string>>}
@@ -646,10 +670,16 @@ export class PreAggregations {
           (references.sortedTimeDimensions || sortTimeDimensions(references.timeDimensions))
       );
 
+      console.log("transformedQuery.ungrouped: " + transformedQuery.ungrouped);
       if (transformedQuery.ungrouped) {
         const allReferenceCubes = R.pipe(R.map(m => (m.dimension || m).split('.')[0]), R.uniq, R.sortBy(R.identity))(
           references.measures.concat(references.dimensions).concat(references.timeDimensions)
         );
+
+        console.log("R.equals(transformedQuery.sortedAllCubeNames, allReferenceCubes): " + R.equals(transformedQuery.sortedAllCubeNames, allReferenceCubes));
+        console.log("dimensionsMatch(transformedQuery.sortedUsedCubePrimaryKeys, true): " + dimensionsMatch(transformedQuery.sortedUsedCubePrimaryKeys, true));
+        console.log("dimensionsMatch(transformedQuery.sortedUsedCubePrimaryKeys, false): " + dimensionsMatch(transformedQuery.sortedUsedCubePrimaryKeys, false));
+
         if (
           !R.equals(transformedQuery.sortedAllCubeNames, allReferenceCubes) ||
           !(
@@ -661,6 +691,26 @@ export class PreAggregations {
       }
 
       const backAliasMeasures = backAlias(references.measures);
+
+      const rallRes = R.all(
+        m => references.measures.indexOf(m) !== -1,
+        transformedQuery.leafMeasures,
+      ) || R.all(
+        m => backAliasMeasures.indexOf(m) !== -1,
+        transformedQuery.measures,
+      )
+
+      console.log("references: ", references);
+
+      console.log("windowGranularityMatches(references): ", windowGranularityMatches(references));
+      console.log("rallRes: ", rallRes);
+      console.log("dimensionsMatch(transformedQuery.sortedDimensions, true): ", dimensionsMatch(transformedQuery.sortedDimensions, true));
+      console.log("timeDimensionsMatch(queryTimeDimensionsList, true): ", timeDimensionsMatch(queryTimeDimensionsList, true));
+      console.log("dimensionsMatch(transformedQuery.ownedDimensions, false): ", dimensionsMatch(transformedQuery.ownedDimensions, false));
+      console.log("timeDimensionsMatch(ownedQueryTimeDimensionsList, false): ", timeDimensionsMatch(ownedQueryTimeDimensionsList, false));
+
+      console.log("--- canUsePreAggregationLeafMeasureAdditive ---");
+
       return ((
         windowGranularityMatches(references)
       ) && (
@@ -689,6 +739,8 @@ export class PreAggregations {
         : canUsePreAggregationNotAdditive;
 
     if (refs) {
+      console.log("refs.length: ", refs.length)
+      console.log("refs", refs);
       return canUseFn(refs);
     } else {
       return canUseFn;
