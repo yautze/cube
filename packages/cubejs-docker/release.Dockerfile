@@ -189,7 +189,7 @@ COPY packages/cubejs-docker/bin-release/cubejs /usr/local/bin/cubejs
 RUN ln -s  packages/cubejs-docker/bin-release/cubestore /usr/local/bin/cubestore
 # End: Copy from latest.Dockerfile
 # install extension 
-ADD packages/cubejs-docker/duckdb_extension/httpfs.duckdb_extension_v1_1_3 /root/.duckdb/extensions/v1.1.3/linux_amd64/httpfs.duckdb_extension
+ADD packages/cubejs-docker/duckdb_extension/httpfs.duckdb_extension_v1_2_0 /root/.duckdb/extensions/v1.2.0/linux_amd64/httpfs.duckdb_extension
 ENV DEV_BUILD_TAG=20250204132850-dev
 COPY packages/cubejs-backend-native /cube/node_modules/@cubejs-backend/native
 
