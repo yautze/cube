@@ -57,6 +57,7 @@ export class ImportExportTranspiler implements TranspilerInterface {
               t.objectExpression(
                 // @ts-ignore
                 path.get('declaration').get('declarations').map(d => t.objectProperty(
+                  // @ts-ignore
                   d.get('id').node,
                   d.get('id').node
                 ))

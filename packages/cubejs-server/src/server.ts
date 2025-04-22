@@ -23,6 +23,7 @@ import { gracefulMiddleware } from './graceful-middleware';
 import { ServerStatusHandler } from './server-status';
 
 const { version } = require('../../package.json');
+const promBundle = require('express-prom-bundle');
 
 dotenv.config({
   multiline: 'line-breaks',
@@ -88,6 +89,16 @@ export class CubejsServer {
       }
 
       const app = express();
+      // Add Prometheus metrics middleware
+      const metricsMiddleware = promBundle({ 
+        includeMethod: true ,
+        includePath: true,
+        normalizePath: [
+          // collect paths like "/customer/johnbobson" as just one "/custom/#name"
+          ['^/cubejs-api/v1/load', '/cubejs-api/v1/load'],
+        ]
+      });
+      app.use(metricsMiddleware);
       app.use(cors(this.config.http.cors));
       app.use(bodyParser.json({ limit: '50mb' }));
 
