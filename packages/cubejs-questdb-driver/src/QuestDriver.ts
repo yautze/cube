@@ -138,6 +138,7 @@ export class QuestDriver<Config extends QuestDriverConfiguration = QuestDriverCo
 
   public async query<R = unknown>(query: string, values: unknown[], _options?: QueryOptions): Promise<R[]> {
     const result = await this.queryResponse(query, values);
+    // @ts-ignore
     return result.rows;
   }
 
@@ -149,6 +150,7 @@ export class QuestDriver<Config extends QuestDriverConfiguration = QuestDriverCo
         text: query,
         values: values || [],
         types: {
+          // @ts-ignore
           getTypeParser: this.getTypeParser,
         },
       });
@@ -159,11 +161,13 @@ export class QuestDriver<Config extends QuestDriverConfiguration = QuestDriverCo
   }
 
   private getTypeParser(dataTypeID: TypeId, format: TypeFormat | undefined) {
+    // @ts-ignore
     const isTimestamp = timestampDataTypes.includes(dataTypeID);
     if (isTimestamp) {
       return timestampTypeParser;
     }
 
+    // @ts-ignore
     const parser = types.getTypeParser(dataTypeID, format);
     return (val: any) => parser(val);
   }
@@ -171,7 +175,9 @@ export class QuestDriver<Config extends QuestDriverConfiguration = QuestDriverCo
   public async downloadQueryResults(query: string, values: unknown[], _options: DownloadQueryResultsOptions) {
     const res = await this.queryResponse(query, values);
     return {
+      // @ts-ignore
       rows: res.rows,
+      // @ts-ignore
       types: this.mapFields(res.fields),
     };
   }

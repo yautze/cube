@@ -39,6 +39,7 @@ use tokio_util::sync::CancellationToken;
 use warp::filters::ws::{Message, Ws};
 use warp::http::StatusCode;
 use warp::reject::Reject;
+use chrono::Local;
 
 pub struct HttpServer {
     bind_address: String,
@@ -141,8 +142,11 @@ impl HttpServer {
                     loop {
                         tokio::select! {
                             Some(res) = response_rx.recv() => {
-                                trace!("Sending web socket response");
-                                let send_res = web_socket.send(Message::binary(res.bytes())).await;
+                                let start_time = Local::now();
+                                let msg = res.bytes();
+                                let duration = (Local::now() - start_time).num_milliseconds();
+                                trace!("Sending web socket response: size = {}, duration = {}", msg.len(), duration);
+                                let send_res = web_socket.send(Message::binary(msg)).await;
                                 if let Err(e) = send_res {
                                     error!("Websocket message send error: {:?}", e)
                                 }
