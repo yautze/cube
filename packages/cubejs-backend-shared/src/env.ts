@@ -2020,6 +2020,9 @@ const variables: Record<string, (...args: any) => any> = {
   cubeStoreNoHeartBeatTimeout: () => get('CUBEJS_CUBESTORE_NO_HEART_BEAT_TIMEOUT')
     .default('30')
     .asInt(),
+  cubeStoreWsMsgMaxSize: () => get('CUBEJS_CUBESTORE_WS_MSG_MAX_SIZE')
+    .default(524288000)
+    .asInt(),
   cubeStoreRollingWindowJoin: () => get('CUBEJS_CUBESTORE_ROLLING_WINDOW_JOIN')
     .default('false')
     .asBoolStrict(),
